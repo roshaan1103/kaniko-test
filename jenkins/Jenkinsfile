@@ -21,7 +21,7 @@ pipeline {
                         "name": "kaniko",
                         "image": "gcr.io/kaniko-project/executor:latest",
                         "args": [
-                          "--dockerfile=Dockerfile",
+                          "--dockerfile=jenkins/Dockerfile",
                           "--context=git://github.com/roshaan1103/kaniko-test.git",
                           "--destination=${DOCKER_IMAGE}:${DOCKER_TAG}"
                         ],

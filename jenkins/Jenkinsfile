@@ -8,12 +8,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/roshaan1103/kaniko-test.git'
-            }
-        }
-
         stage('Build & Push Image with Kaniko') {
             steps {
                 sh """

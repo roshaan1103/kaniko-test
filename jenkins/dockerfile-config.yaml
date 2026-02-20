@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kaniko-dockerfile
+  namespace: jenkins
+data:
+  Dockerfile: |
+    FROM alpine
+    CMD ["echo", "Hello from Kaniko"]
+

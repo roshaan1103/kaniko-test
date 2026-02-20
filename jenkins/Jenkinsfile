@@ -1,0 +1,55 @@
+pipeline {
+  agent any
+
+  environment {
+    IMAGE_NAME = "roshaan1103/mi-aiops-app"
+    IMAGE_TAG  = "latest"
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Build & Push Image (Kaniko)') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh '''
+          cat > /kaniko/.docker/config.json <<EOF
+          {
+            "auths": {
+              "https://index.docker.io/v1/": {
+                "username": "$DOCKER_USER",
+                "password": "$DOCKER_PASS"
+              }
+            }
+          }
+          EOF
+
+          /kaniko/executor \
+            --context $PWD \
+            --dockerfile docker/Dockerfile \
+            --destination ${IMAGE_NAME}:${IMAGE_TAG}
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        sh '''
+        kubectl apply -f k8s/
+        kubectl rollout status deployment/mi-aiops -n jenkins
+        '''
+      }
+    }
+  }
+}
+

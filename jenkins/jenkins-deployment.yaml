@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: jenkins
+      imagePullSecrets:
+      - name: dockerhub-secret
+      containers:
+      - name: jenkins
+        image: jenkins-custom:3.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+        volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+        - name: docker-config
+          mountPath: /kaniko/.docker
+          readOnly: true
+
+      volumes:
+      - name: jenkins-home
+        persistentVolumeClaim:
+          claimName: jenkins-pvc
+      - name: docker-config
+        secret:
+          secretName: dockerhub-secret
+          items:
+          - key: .dockerconfigjson
+            path: config.json
+
+

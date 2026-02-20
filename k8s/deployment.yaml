@@ -1,0 +1,22 @@
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiops-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aiops-app
+  template:
+    metadata:
+      labels:
+        app: aiops-app
+    spec:
+      containers:
+      - name: app
+        image: roshaan1103/mi-aiops-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+

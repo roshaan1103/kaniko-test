@@ -45,5 +45,17 @@ pipeline {
                 """
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh """
+                kubectl set image deployment/kaniko-app \
+                kaniko-app=${DOCKER_IMAGE}:${DOCKER_TAG} \
+                -n jenkins
+
+                kubectl rollout status deployment/kaniko-app -n jenkins
+                """
+            }
+        } 
+
     }
 }

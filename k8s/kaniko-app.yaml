@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kaniko-app
+  namespace: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kaniko-app
+  template:
+    metadata:
+      labels:
+        app: kaniko-app
+    spec:
+      containers:
+      - name: kaniko-app
+        image: roshaan1103/kaniko-test:latest
+        ports:
+        - containerPort: 8080

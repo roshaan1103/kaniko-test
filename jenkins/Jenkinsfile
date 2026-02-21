@@ -48,7 +48,7 @@ pipeline {
 	stage('Wait for Image') {
             steps {
                 sh """
-		until docker maifest inspect roshaan1103/kaniko-test:${BUILD_NUMBER} > /dev/null 2>&1; do
+		until docker manifest inspect roshaan1103/kaniko-test:${BUILD_NUMBER} > /dev/null 2>&1; do
 		  echo "Waiting for Image..."
 		  sleep 50
 		done

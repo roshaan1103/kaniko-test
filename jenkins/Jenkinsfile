@@ -50,7 +50,7 @@ pipeline {
                 sh """
 		until docker maifest inspect roshaan1103/kaniko-test:${BUILD_NUMBER} > /dev/null 2>&1; do
 		  echo "Waiting for Image..."
-		  sleep 5
+		  sleep 50
 		done
 		"""
             }
@@ -58,13 +58,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                kubectl apply -f k8s/kaniko-app.yaml -n jenkins
-
-                kubectl set image deployment/kaniko-app \
-                kaniko-app=${DOCKER_IMAGE}:${DOCKER_TAG} \
-                -n jenkins
-
-                kubectl rollout status deployment/kaniko-app -n jenkins
+                helm upgrade --install kaniko-app ./kaniko-app \
+		  --namespace jenkins \
+		  --set image.tag=${BUILD_NUMBER}
                 """
             }
         } 

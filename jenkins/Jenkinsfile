@@ -33,9 +33,9 @@ pipeline {
                       "volumes": [{
                         "name": "docker-config",
                         "secret": {
-                          "secretName": "dockerhub-secret"
+                          "secretName": "dockerhub-secret",
                           "items": {
-                            "key": ".dockerconfigjson"
+                            "key": ".dockerconfigjson",
                             "path": "config.json"
                          }
                         }

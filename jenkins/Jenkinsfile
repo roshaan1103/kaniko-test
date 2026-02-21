@@ -37,33 +37,27 @@ pipeline {
                           "items": [{
                             "key": ".dockerconfigjson",
                             "path": "config.json"
-                         }]
+                          }]
                         }
                       }]
                     }
                   }'
+
+                kubectl wait --for=condition=complete pod/kaniko-${BUILD_NUMBER} -n jenkins --timeout=600s
                 """
             }
         }
-	stage('Wait for Image') {
-            steps {
-                sh """
-		until docker manifest inspect roshaan1103/kaniko-test:${BUILD_NUMBER} > /dev/null 2>&1; do
-		  echo "Waiting for Image..."
-		  sleep 50
-		done
-		"""
-            }
-        }
+
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
                 helm upgrade --install kaniko-app ./kaniko-app \
-		  --namespace jenkins \
-		  --set image.tag=${BUILD_NUMBER}
+                  --namespace jenkins \
+                  --set image.tag=${BUILD_NUMBER}
+
+                kubectl rollout status deployment/kaniko-app -n jenkins --timeout=300s
                 """
             }
-        } 
-
+        }
     }
 }

@@ -34,10 +34,10 @@ pipeline {
                         "name": "docker-config",
                         "secret": {
                           "secretName": "dockerhub-secret",
-                          "items": {
+                          "items": [{
                             "key": ".dockerconfigjson",
                             "path": "config.json"
-                         }
+                         }]
                         }
                       }]
                     }

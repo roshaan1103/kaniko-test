@@ -48,6 +48,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
+                kubectl apply -f jenkins/kaniko-app.yaml -n jenkins
+
                 kubectl set image deployment/kaniko-app \
                 kaniko-app=${DOCKER_IMAGE}:${DOCKER_TAG} \
                 -n jenkins

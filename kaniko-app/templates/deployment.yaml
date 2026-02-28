@@ -33,34 +33,39 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        resources:
-          {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
 
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 10
+          ports:
+            - containerPort: 8080
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
 
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-        initialDelaySeconds: 5
-        periodSeconds: 5 
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5 
       {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}
+
       {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}
+
       {{- with .Values.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}

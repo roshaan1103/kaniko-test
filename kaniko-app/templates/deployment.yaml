@@ -44,17 +44,21 @@ spec:
 
           livenessProbe:
             httpGet:
-              path: /
+              path: /login
               port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
 
           readinessProbe:
             httpGet:
-              path: /
+              path: /login
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5 
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            timeoutSecond: 5
+            failureThreshold: 5 
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 10 }}

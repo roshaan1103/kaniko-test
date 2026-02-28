@@ -20,7 +20,7 @@ spec:
       - name: dockerhub-secret
       containers:
       - name: jenkins
-        image: jenkins-custom:3.0
+        image: jenkins-custom:4.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

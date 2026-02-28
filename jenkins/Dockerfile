@@ -15,5 +15,7 @@ RUN curl -Lo /usr/local/bin/executor \
     https://github.com/GoogleContainerTools/kaniko/releases/latest/download/executor-linux-amd64 \
     && chmod +x /usr/local/bin/executor
 
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
 USER jenkins
 

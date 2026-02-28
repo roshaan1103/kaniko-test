@@ -13,15 +13,37 @@ pipeline {
         stage('Build & Push Image with Kaniko Job') {
             steps {
                 sh """
-                echo "Creating Kaniko Job..."
+                echo "Creating Kaniko Job with DockerHub secret..."
 
-                kubectl create job ${JOB_NAME} \
-                  --namespace=${NAMESPACE} \
-                  --image=gcr.io/kaniko-project/executor:latest \
-                  -- /kaniko/executor \
-                  --dockerfile=jenkins/Dockerfile \
-                  --context=git://github.com/roshaan1103/kaniko-test.git \
-                  --destination=${DOCKER_IMAGE}:${DOCKER_TAG}
+                cat <<EOF | kubectl apply -f -
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${JOB_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:latest
+        args:
+        - "--dockerfile=jenkins/Dockerfile"
+        - "--context=git://github.com/roshaan1103/kaniko-test.git"
+        - "--destination=${DOCKER_IMAGE}:${DOCKER_TAG}"
+        volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+      volumes:
+      - name: docker-config
+        secret:
+          secretName: dockerhub-secret
+          items:
+          - key: .dockerconfigjson
+            path: config.json
+EOF
 
                 echo "Waiting for Kaniko job to complete..."
                 kubectl wait --for=condition=complete job/${JOB_NAME} \
@@ -36,7 +58,7 @@ pipeline {
         stage('Deploy to Kubernetes with Helm') {
             steps {
                 sh """
-                echo "Deploying application with Helm..."
+                echo "Deploying with Helm..."
 
                 helm upgrade --install kaniko-app ./kaniko-app \
                   --namespace ${NAMESPACE} \
@@ -52,7 +74,7 @@ pipeline {
         stage('Cleanup Kaniko Job') {
             steps {
                 sh """
-                echo "Cleaning up Kaniko job..."
+                echo "Cleaning up Kaniko Job..."
                 kubectl delete job ${JOB_NAME} -n ${NAMESPACE} --ignore-not-found=true
                 """
             }
